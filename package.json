@@ -1,7 +1,7 @@
 {
   "name": "mern",
   "version": "1.0.0",
-  "description": "A small social network for developer developed with MERN stack",
+  "description": "A small social network for developers developed with MERN stack",
   "main": "server.js",
   "scripts": {
     "start": "node server",
