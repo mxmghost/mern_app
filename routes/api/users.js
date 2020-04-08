@@ -15,14 +15,12 @@ const User = require("../../models/User");
 router.post(
   "/",
   [
-    check("name", "Name is requires")
-      .not()
-      .isEmpty(),
+    check("name", "Name is required").not().isEmpty(),
     check("email", "Please include a valid email").isEmail(),
     check(
       "password",
       "Please enter a password with 6 or more characters"
-    ).isLength({ min: 6 })
+    ).isLength({ min: 6 }),
   ],
   async (req, res) => {
     // Validating the data input
@@ -45,14 +43,14 @@ router.post(
       const avatar = gravatar.url(email, {
         s: "200",
         r: "pg",
-        d: "mm"
+        d: "mm",
       });
 
       user = new User({
         name,
         email,
         avatar,
-        password
+        password,
       });
 
       // Encypting password
@@ -65,8 +63,8 @@ router.post(
       // Payload to with user id from the mongoDB
       const payload = {
         user: {
-          id: user.id
-        }
+          id: user.id,
+        },
       };
       // Creating the jwt with the user id and sending it back to the client.
       jwt.sign(

@@ -15,6 +15,7 @@ const { check, validationResult } = require("express-validator/check");
 // is registered and had the jwtoken.
 router.get("/", auth, async (req, res) => {
   try {
+    // The user id is in our jsonwebtoken that we wi
     const user = await User.findById(req.user.id).select("-password");
     res.json(user);
   } catch (err) {
@@ -30,7 +31,7 @@ router.post(
   "/",
   [
     check("email", "Please include a valid email").isEmail(),
-    check("password", "Password is required").exists()
+    check("password", "Password is required").exists(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -59,8 +60,8 @@ router.post(
 
       const payload = {
         user: {
-          id: user.id
-        }
+          id: user.id,
+        },
       };
 
       jwt.sign(
