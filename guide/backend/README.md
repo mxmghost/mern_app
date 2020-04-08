@@ -367,6 +367,7 @@ Interesting Knowledge:
 
 - Importance of project guidelines
 - How to make POSTMAN petitions
+- IP whitelist of MongoDB
 
 Words:
 
