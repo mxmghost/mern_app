@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { check, validationResult } = require("express-validator/check");
+const { check, validationResult } = require("express-validator");
 const auth = require("../../middleware/auth");
 
-const Post = require("../../models/Post");
+const Post = require("../../models/Posts");
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
 
@@ -128,7 +128,7 @@ router.put("/like/:id", auth, async (req, res) => {
 });
 
 // @route    PUT api/posts/unlike/:id
-// @desc     Like a post
+// @desc     Unlike a post
 // @access   Private
 router.put("/unlike/:id", auth, async (req, res) => {
   try {

@@ -1,17 +1,43 @@
-# Backend for our application
+# Backend
 
-- [Backend for our application](#backend-for-our-application)
+This show the process of creation of the Mongo DB **database** and all the **API** petitions. Also shows the implementation of the middleware using jsonwebtoken for users authentication.
+
+In a nutshell, the user (name,email,password) should be able to create a profile and posts.
+
+## Table of Contents
+
+- [Backend](#backend)
+  - [Table of Contents](#table-of-contents)
+- [Basic Setup](#basic-setup)
   - [Setting up MongoDB ATLAS](#setting-up-mongodb-atlas)
   - [Install dependencies & Basic express setup](#install-dependencies--basic-express-setup)
+    - [Install dependencies](#install-dependencies)
     - [Run a simple express server](#run-a-simple-express-server)
   - [Conecting to MongoDB with Mongoose](#conecting-to-mongodb-with-mongoose)
   - [Create the route files with express router](#create-the-route-files-with-express-router)
+- [User](#user)
   - [Create the user model](#create-the-user-model)
   - [User registration and middleware for authentication](#user-registration-and-middleware-for-authentication)
     - [User registration logic and creating the jsonwebtoken](#user-registration-logic-and-creating-the-jsonwebtoken)
-    - [auth middleware to authenticate with jsonwebtoken.](#auth-middleware-to-authenticate-with-jsonwebtoken)
+    - [Auth middleware to authenticate with jsonwebtoken.](#auth-middleware-to-authenticate-with-jsonwebtoken)
   - [User login](#user-login)
-  - [Create profile and get current profile](#create-profile-and-get-current-profile)
+- [Profile](#profile)
+  - [GET current users profile](#get-current-users-profile)
+  - [POST create or update user profile](#post-create-or-update-user-profile)
+  - [GET all profiles](#get-all-profiles)
+  - [GET profile by user ID](#get-profile-by-user-id)
+  - [DELETE profile, user and posts](#delete-profile-user-and-posts)
+  - [PUT profile experience](#put-profile-experience)
+  - [DELETE profile experience](#delete-profile-experience)
+- [Posts](#posts)
+  - [POST Comment a post](#post-comment-a-post)
+- [Files](#files)
+- [Extra](#extra)
+  - [Required knowledge for this project:](#required-knowledge-for-this-project)
+  - [Interesting Knowledge:](#interesting-knowledge)
+    - [Mongoose populate](#mongoose-populate)
+
+# Basic Setup
 
 ## Setting up MongoDB ATLAS
 
@@ -20,9 +46,11 @@ This setting is pretty straightforward as you only need to do the following thin
 - Register/Login
 - Create a project
 - Create a cluster
-- Create a user 
+- Create a user
 
 ## Install dependencies & Basic express setup
+
+### Install dependencies
 
 Create the directory for the project and change to that directory within our **terminal**.
 
@@ -34,10 +62,12 @@ cd ProjectName
 Create the .gitignore file and include the following content:
 
 .gitignore
+
 ```txt
 node_modules/
 config/default.json
 ```
+
 This allows us to ignore the trace of this paths in our repository.
 We don't need to track the node_modules as we are only reading and using them. In other words we are not changing them.
 The default.json in the config directory is a file which we are using our tokens and passwords for connecting to API's. This is just for safety reasons as we are pushing our project to a public github repository.
@@ -54,7 +84,7 @@ npm init
 Then we can now install all the basic dependencies for our project:
 
 ```bash
-npm install express express-validator bcryptjs config gravatar jsonwebtoken mongoose request 
+npm install express express-validator bcryptjs config gravatar jsonwebtoken mongoose request
 ```
 
 Now the development dependecies:
@@ -69,30 +99,28 @@ List of dependencies and their usage:
 
 - express-validator: a set of express.js **middlewares** that wraps validator.js (a library of **string validators** and sanitizers).
 
+* bcryptjs: Optimized bcrypt (algorith for password encryption) in JavaScript with zero dependencies.
 
-- bcryptjs: Optimized bcrypt (algorith for password encryption) in JavaScript with zero dependencies.
-
-
-- config:  Node-config organizes hierarchical configurations for your app deployments. It allows us to create global variables that we can use through all of our files in the project.
+- config: Node-config organizes hierarchical configurations for your app deployments. It allows us to create global variables that we can use through all of our files in the project.
 
 - gravatar: A library to generate Gravatar URLs in Node.js Based on [gravatar](http://en.gravatar.com/support/what-is-gravatar/) specs
 
 - jsonwebtoken: JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties. And this module allows us to use them for user authentication in our web app.
-  
+
 - mongoose: Mongoose is a MongoDB object modeling tool designed to work in an asynchronous environment. Mongoose supports both promises and callbacks. This allows us to work with a Mongo DB easily.
 
+* request: Request is designed to be the simplest way possible to make http calls. It supports HTTPS and follows redirects by default.
 
-- request: Request is designed to be the simplest way possible to make http calls. It supports HTTPS and follows redirects by default.
+* nodemon: Refresh server every time we change a file.
 
-- nodemon: Refresh server every time we change a file.
-
-- concurrently: Run backend and frontend simultaneously with a single command.
+* concurrently: Run backend and frontend simultaneously with a single command.
 
 ### Run a simple express server
 
 Create the **server.js** file:
 
 server.js
+
 ```js
 const express = require("express");
 const app = express();
@@ -112,6 +140,7 @@ app.listen(PORT, () => console.log(`Server started on Port ${PORT}...`));
 Configure some commands to call scripts in the **package.json** file.
 
 package.json
+
 ```json
 {
   "scripts": {
@@ -160,6 +189,7 @@ module.exports = router;
 ```
 
 Then we update our **server.js** to use this routes.
+
 ```js
 // Define routes for the API
 app.use("/api/users", require("./routes/api/users"));
@@ -170,9 +200,13 @@ app.use("/api/posts", require("./routes/api/posts"));
 
 We can test it with POSTMAN with some GET petitions.
 
+# User
+
 ## [Create the user model](https://github.com/mxmghost/mern_app/commit/c4a0a1d0cd95f1e13dd354a8de3e7c19e2a781ec)
 
-Then we create a dir for the models of our database. Inside of it we create the file User.js
+Create a dir for the models of our database. Inside of it we create the file User.js
+
+_/models/User.js_
 
 ```js
 const mongoose = require("mongoose");
@@ -180,24 +214,24 @@ const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   avatar: {
-    type: String
+    type: String,
   },
   date: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 module.exports = User = mongoose.model("user", UserSchema);
@@ -225,7 +259,7 @@ const User = require("../../models/User");
 // @desc    Register user
 // @access  Public
 
-// 1. Validate the user input with express-validator 
+// 1. Validate the user input with express-validator
 // 2. Check if it exists in the db
 // 3. Get the gravatar profile pic
 // 4. Encrypt the password
@@ -303,25 +337,25 @@ router.post(
 );
 
 module.exports = router;
-
 ```
 
 Now we can test the user registration with POSTMAN. We should see the token as successful response.
 
 Then we should make the auth js as a private route so when it receive a get petition it will let you see the user data.
 
-### auth middleware to authenticate with jsonwebtoken.
+### Auth middleware to authenticate with jsonwebtoken.
 
 In this part of the project we are creating the middleware that will let us authenticate users with the jsonwebtoken generated using the npm module jsonwebtoken. In a nutshell, once the user successfully sign in or register within our website. The server should return a jsonwebtoken to the client this token will now always had to be in the header of the user petitions, the middleware will handle it and if the user id decoded from the token exists in our database, the client would now have access to the protected routes of our website.
 
 Crate the dir middleware and the **auth.js** within it.
 
-*middleware/auth.js*
+_middleware/auth.js_
+
 ```js
 const jwt = require("jsonwebtoken");
 const config = require("config");
 
-module.exports = function(req, res, next) {
+module.exports = function (req, res, next) {
   // Get token from header
   const token = req.header("x-auth-token");
 
@@ -353,21 +387,352 @@ app.use(express.json({ extended: false }));
 For the user login we should make the jsonwebtoken auth in the **routes/api/auth.js** file to allow the user to sign in.
 Just as we did in the registration with some simple variations.
 
-## Create profile and get current profile
+# Profile
 
+Now we are creating a new model that will let us handle the profile of the users.
 
-Required knowledge for this project:
+## GET current users profile
+
+```js
+// @route    GET api/profile/me
+// @desc     Get current users profile
+// @access   Private
+router.get("/me", auth, async (req, res) => {
+  try {
+    // Search for the profile of the user using the user's id
+    // This user id comes from the token decoded in the auth middleware.
+    const profile = await Profile.findOne({
+      user: req.user.id,
+    }).populate("user", ["name", "avatar"]);
+    // We use populate method to have available the name and the avatar form the user.
+
+    if (!profile) {
+      return res.status(400).json({ msg: "There is no profile for this user" });
+    }
+
+    res.json(profile);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+```
+
+## POST create or update user profile
+
+- Check validation errors.
+- Build object we want to add to our database
+- Insert/Update our database
+
+```js
+// @route    POST api/profile
+// @desc     Create or update user profile
+// @access   Private
+router.post(
+  "/",
+  [
+    auth,
+    [
+      check("status", "Status is required").not().isEmpty(),
+      check("skills", "Skills is required").not().isEmpty(),
+    ],
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const {
+      company,
+      website,
+      location,
+      bio,
+      status,
+      githubusername,
+      skills,
+      youtube,
+      facebook,
+      twitter,
+      instagram,
+      linkedin,
+    } = req.body;
+
+    // Build profile object
+    const profileFields = {};
+    profileFields.user = req.user.id;
+    if (company) profileFields.company = company;
+    if (website) profileFields.website = website;
+    if (location) profileFields.location = location;
+    if (bio) profileFields.bio = bio;
+    if (status) profileFields.status = status;
+    if (githubusername) profileFields.githubusername = githubusername;
+    if (skills) {
+      profileFields.skills = skills.split(",").map((skill) => skill.trim());
+    }
+
+    // Build social object
+    profileFields.social = {};
+    if (youtube) profileFields.social.youtube = youtube;
+    if (twitter) profileFields.social.twitter = twitter;
+    if (facebook) profileFields.social.facebook = facebook;
+    if (linkedin) profileFields.social.linkedin = linkedin;
+    if (instagram) profileFields.social.instagram = instagram;
+
+    try {
+      let profile = await Profile.findOne({ user: req.user.id });
+
+      if (profile) {
+        // Update
+        profile = await Profile.findOneAndUpdate(
+          { user: req.user.id },
+          { $set: profileFields },
+          { new: true }
+        );
+
+        return res.json(profile);
+      }
+
+      // Create
+      profile = new Profile(profileFields);
+
+      await profile.save();
+      res.json(profile);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server Error");
+    }
+  }
+);
+```
+
+## GET all profiles
+
+```js
+// @route    GET api/profile
+// @desc     Get all profiles
+// @access   Public
+router.get("/", async (req, res) => {
+  try {
+    const profiles = await Profile.find().populate("user", ["name", "avatar"]);
+    res.json(profiles);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+```
+
+## GET profile by user ID
+
+```js
+// @route    GET api/profile/user/:user_id
+// @desc     Get profile by user ID
+// @access   Public
+router.get("/user/:user_id", async (req, res) => {
+  try {
+    const profile = await Profile.findOne({
+      user: req.params.user_id,
+    }).populate("user", ["name", "avatar"]);
+
+    if (!profile) return res.status(400).json({ msg: "Profile not found" });
+
+    res.json(profile);
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind == "ObjectId") {
+      return res.status(400).json({ msg: "Profile not found" });
+    }
+    res.status(500).send("Server Error");
+  }
+});
+```
+
+## DELETE profile, user and posts
+
+```js
+// @route    DELETE api/profile
+// @desc     Delete profile, user & posts
+// @access   Private
+router.delete("/", auth, async (req, res) => {
+  try {
+    // @todo - remove users posts
+
+    // Remove profile
+    await Profile.findOneAndRemove({ user: req.user.id });
+    // Remove user
+    await User.findOneAndRemove({ _id: req.user.id });
+
+    res.json({ msg: "User deleted" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+```
+
+## PUT profile experience
+
+```js
+// @route    PUT api/profile/experience
+// @desc     Add profile experience
+// @access   Private
+router.put(
+  "/experience",
+  [
+    auth,
+    [
+      check("title", "Title is required").not().isEmpty(),
+      check("company", "Company is required").not().isEmpty(),
+      check("from", "From date is required").not().isEmpty(),
+    ],
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const {
+      title,
+      company,
+      location,
+      from,
+      to,
+      current,
+      description,
+    } = req.body;
+
+    const newExp = {
+      title,
+      company,
+      location,
+      from,
+      to,
+      current,
+      description,
+    };
+
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+      // We insert in the beginnig of the array the new experience.
+      profile.experience.unshift(newExp);
+
+      await profile.save();
+
+      res.json(profile);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server Error");
+    }
+  }
+);
+```
+
+## DELETE profile experience
+
+```js
+// @route    DELETE api/profile/experience/:exp_id
+// @desc     Delete experience from profile
+// @access   Private
+router.delete("/experience/:exp_id", auth, async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+
+    // Get remove index
+    const removeIndex = profile.experience
+      .map((item) => item.id)
+      .indexOf(req.params.exp_id);
+
+    profile.experience.splice(removeIndex, 1);
+
+    await profile.save();
+
+    res.json(profile);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+```
+
+# Posts
+
+## POST Comment a post
+
+```js
+// @route    POST api/posts/comment/:id
+// @desc     Comment on a post
+// @access   Private
+router.post(
+  "/comment/:id",
+  [auth, [check("text", "Text is required").not().isEmpty()]],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const user = await User.findById(req.user.id).select("-password");
+      const post = await Post.findById(req.params.id);
+
+      const newComment = {
+        text: req.body.text,
+        name: user.name,
+        avatar: user.avatar,
+        user: req.user.id,
+      };
+
+      post.comments.unshift(newComment);
+
+      await post.save();
+
+      res.json(post.comments);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server Error");
+    }
+  }
+);
+```
+
+# Files
+
+Models:
+
+- [Posts](../../models/Posts.js)
+- [Profile](../../models/Profile.js)
+- [User](../../models/User.js)
+
+API:
+
+- [auth](../../routes/api/auth.js)
+- [posts](../../routes/api/posts.js)
+- [profile](../../routes/api/profile.js)
+- [users](../../routes/api/users.js)
+
+# Extra
+
+## Required knowledge for this project:
 
 - Basic node/npm usage.
 - Basic git and github usage.
 - Basic usage of POSTMAN
 - Middleware
 
-Interesting Knowledge:
+## Interesting Knowledge:
 
 - Importance of project guidelines
 - How to make POSTMAN petitions
 - IP whitelist of MongoDB
+- Mongoose types
+- Moongose why it uses promises and how it work
+- Moongose populate
+
+### Mongoose populate
+
+This is an operation join-like that lets you reference documents in other collections. This process automatically replaces all the specified paths in the document with document(s) from other collection(s).
 
 Words:
 
