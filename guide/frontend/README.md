@@ -112,8 +112,34 @@ export default App;
 
 In this file just add all your css if you have one.
 
-# Navbar and Landing
+# Components
+
+- layout
+  - Navbar
+  - Landing
+- auth
+  - Register
+  - Login
 
 Create the folder /client/components/layout and add within the Navbar.js and the Landing.js
 
 # React router
+
+In the **App.js** we need to import the browser router, route and switch from react-router-dom
+
+- Create the two new components and modify the a tags to links so they adapt to work with react router.
+
+# Request example with axios without redux implementation
+
+# Extra
+
+## shortcuts
+
+- rafc - create react functional component
+
+## Tips
+
+- Get everything in a container class except from the landing page. So all the content is always centered.
+- React link from router instead of a tags with href.
+- Learn to use react state
+-
