@@ -1,6 +1,6 @@
-# Frontend TODO Introduction
+# Frontend
 
-# React and concurrently setup
+## React and concurrently setup
 
 In the root folder of our project we use the tool create-react-app for an easy and quick setup.
 
@@ -129,7 +129,20 @@ In the **App.js** we need to import the browser router, route and switch from re
 
 - Create the two new components and modify the a tags to links so they adapt to work with react router.
 
-# Request example with axios without redux implementation
+# Redux Setup and Alerts
+
+In the src folder from our client we need to create a store.js folder, this will be a boilerplate??
+
+Wrap the app.js component with provider component from the react-redux module with our as store.js file as a prop
+
+Create the directory reducers and within create the index.js file.
+
+# Redux Alert reducer, action & types
+
+We create the directory client/src/action and within the files alert.js and types.js
+We create the file alert.js inside our reducers folder.
+
+# Redux Setup & Alerts
 
 # Extra
 
@@ -140,6 +153,6 @@ In the **App.js** we need to import the browser router, route and switch from re
 ## Tips
 
 - Get everything in a container class except from the landing page. So all the content is always centered.
-- React link from router instead of a tags with href.
-- Learn to use react state
+- React link from router instead of **a** tags with href.
+- react hooks
 -
